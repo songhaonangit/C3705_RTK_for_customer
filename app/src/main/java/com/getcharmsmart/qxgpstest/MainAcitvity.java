@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -39,7 +40,7 @@ public class MainAcitvity extends AppCompatActivity {
     TextView tv_result,tv_time,tv_postion,tv_type;
     QxGPSManager qxGPSManager;
     final   SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+    private static Handler mHandler;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +49,20 @@ public class MainAcitvity extends AppCompatActivity {
         tv_result =  findViewById(R.id.tv_result);
         tv_postion =  findViewById(R.id.tv_postion);
         tv_type =  findViewById(R.id.tv_gps_type);
-
         init();
+
 
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mHandler ==null){
+            mHandler = new Handler();
+        }
+        Log.d(TAG,"--------onResume---init()-");
+    }
 
     @Override
     public void onBackPressed() {
@@ -65,6 +75,8 @@ public class MainAcitvity extends AppCompatActivity {
         if(qxGPSManager!=null){
             qxGPSManager.closeGps();
         }
+        mHandler.removeCallbacksAndMessages(null);
+        Log.d(TAG,"--------onBackPressed-");
     }
 
     @Override
@@ -78,6 +90,8 @@ public class MainAcitvity extends AppCompatActivity {
         if(qxGPSManager!=null){
             qxGPSManager.closeGps();
         }
+        mHandler.removeCallbacksAndMessages(null);
+        Log.d(TAG,"--------onDestroy-");
 
     }
 
@@ -133,7 +147,7 @@ public class MainAcitvity extends AppCompatActivity {
 
             @Override
             public void onDataByteReceived(byte[] str) {
-                runOnUiThread(new Runnable() {
+                mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         setdata(str);
@@ -148,7 +162,7 @@ public class MainAcitvity extends AppCompatActivity {
                 final  String  Lat = Double.toString(ggaData.getPosition().getLatitude());
                 final  String  fix = ggaData.getFixQuality().toString();
 
-                runOnUiThread(new Runnable() {
+                mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         tv_postion.setText(Lng+","+Lat);
