@@ -143,6 +143,7 @@ public class MainAcitvity extends AppCompatActivity {
             @Override
             public void onDataReceived(String str) {
 
+
             }
 
             @Override
